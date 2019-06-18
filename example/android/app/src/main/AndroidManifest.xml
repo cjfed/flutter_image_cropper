@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
+            android:name="com.steelkiwi.cropiwa.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>

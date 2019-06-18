@@ -1,6 +1,5 @@
 package vn.hunghd.flutter.plugins.imagecropper;
 
-import com.yalantis.ucrop.UCrop;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;

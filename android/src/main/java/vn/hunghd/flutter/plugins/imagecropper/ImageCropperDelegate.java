@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 
-import com.yalantis.ucrop.UCrop;
+import com.steelkiwi.cropiwa.*;
 
 import java.io.File;
 import java.util.Date;
@@ -22,6 +22,7 @@ public class ImageCropperDelegate implements PluginRegistry.ActivityResultListen
     private MethodChannel.Result pendingResult;
     private MethodCall methodCall;
     private FileUtils fileUtils;
+    public static final int REQUEST_CROP = 69;
 
     public ImageCropperDelegate(Activity activity) {
         this.activity = activity;
@@ -44,63 +45,17 @@ public class ImageCropperDelegate implements PluginRegistry.ActivityResultListen
         methodCall = call;
         pendingResult = result;
 
-        File outputDir = activity.getCacheDir();
-        File outputFile = new File(outputDir, "image_cropper_" + (new Date()).getTime() + ".jpg");
-
-        Uri sourceUri = Uri.fromFile(new File(sourcePath));
-        Uri destinationUri = Uri.fromFile(outputFile);
-        UCrop.Options options = new UCrop.Options();
-        options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-        if (circleShape) {
-            options.setCircleDimmedLayer(true);
-        }
-        options.setCompressionQuality(90);
-        if (title != null) {
-            options.setToolbarTitle(title);
-        }
-        if (toolbarColor != null) {
-            int intColor = toolbarColor.intValue();
-            options.setToolbarColor(intColor);
-        }
-        if (statusBarColor != null) {
-            int intColor = statusBarColor.intValue();
-            options.setStatusBarColor(intColor);
-        } else if (toolbarColor != null) {
-            int intColor = toolbarColor.intValue();
-            options.setStatusBarColor(darkenColor(intColor));
-        }
-        if (toolbarWidgetColor != null) {
-            int intColor = toolbarWidgetColor.intValue();
-            options.setToolbarWidgetColor(intColor);
-        }
-        if (actionBackgroundColor != null) {
-            int intColor = actionBackgroundColor.intValue();
-            options.setRootViewBackgroundColor(intColor);
-        }
-        if (actionActiveColor != null) {
-            int intColor = actionActiveColor.intValue();
-            options.setActiveControlsWidgetColor(intColor);
-        }
-        UCrop cropper = UCrop.of(sourceUri, destinationUri).withOptions(options);
-        if (maxWidth != null && maxHeight != null) {
-            cropper.withMaxResultSize(maxWidth, maxHeight);
-        }
-        if (ratioX != null && ratioY != null) {
-            cropper.withAspectRatio(ratioX.floatValue(), ratioY.floatValue());
-        }
-        cropper.start(activity);
+        Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra(MainActivity.IMAGE_PATH, sourcePath);
+        activity.startActivityForResult(intent, REQUEST_CROP);
     }
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == UCrop.REQUEST_CROP) {
-            if (resultCode == RESULT_OK) {
-                final Uri resultUri = UCrop.getOutput(data);
+        if (requestCode == REQUEST_CROP) {
+            if (resultCode == 1101) {
+                final Uri resultUri = data.getParcelableExtra(MainActivity.OUTPUT_URI);
                 finishWithSuccess(fileUtils.getPathFromUri(activity, resultUri));
-                return true;
-            } else if (resultCode == UCrop.RESULT_ERROR) {
-                final Throwable cropError = UCrop.getError(data);
-                finishWithError("crop_error", cropError.getLocalizedMessage(), cropError);
                 return true;
             } else {
                 pendingResult.success(null);
