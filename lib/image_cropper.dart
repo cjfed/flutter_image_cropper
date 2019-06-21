@@ -48,7 +48,7 @@ class ImageCropper {
   ///
   /// A result file of the cropped image
   ///
-  static Future<File> cropImage({
+  static Future<String> cropImage({
     @required String sourcePath,
     double ratioX,
     double ratioY,
@@ -84,6 +84,6 @@ class ImageCropper {
       'statusbar_color': statusBarColor?.value,
       'toolbar_widget_color': toolbarWidgetColor?.value,
     });
-    return resultPath == null ? null : new File(resultPath);
+    return (resultPath == null || resultPath.isEmpty) ? null : resultPath;
   }
 }
